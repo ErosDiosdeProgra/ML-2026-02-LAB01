@@ -1,0 +1,16 @@
+name: lab-noticias-obsidian
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - requests
+  - beautifulsoup4
+  - lxml
+  - feedparser
+  - pandas
+  - matplotlib
+  - python-dotenv
+  - pip
+  - pip:
+      - google-generativeai
