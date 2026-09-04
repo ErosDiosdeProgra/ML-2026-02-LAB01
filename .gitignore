@@ -1,0 +1,49 @@
+# Entorno y secretos
+.env
+.conda/
+.venv/
+venv/
+
+# Entorno cursor
+# Cursor (local)
+.cursor/
+.cursorrules
+*.plan.md
+.cursorignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Salidas del pipeline (se regeneran)
+data/raw/*.html
+data/processed/*.txt
+data/json/*.json
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/json/.gitkeep
+
+# Notas generadas del vault (se conservan las carpetas)
+obsidian_vault/**/*.md
+!obsidian_vault/**/.gitkeep
+
+# LaTeX
+# docs/*.aux
+# docs/*.log
+# docs/*.nav
+# docs/*.out
+# docs/*.snm
+# docs/*.toc
+# docs/*.vrb
+# docs/*.fls
+# docs/*.fdb_latexmk
+# docs/*.synctex.gz
+docs/ .gitkeep
+
+# Sistema
+.DS_Store
+*.swp
