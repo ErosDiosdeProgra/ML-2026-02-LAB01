@@ -140,5 +140,4 @@ src/conocimiento/       Interfaz Obsidian + slugify
 src/analisis/           Interfaz Data Understanding
 data/                   URLs, HTML, texto, JSON
 obsidian_vault/         Bóveda (a generar por el alumno)
-docs/                   Presentaciones Beamer (lab 01 y 02)
 ```
