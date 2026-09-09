@@ -82,13 +82,7 @@ Si ejecuta una etapa pendiente, el programa imprime una pista y **no falla en si
 4. `ExtractorGemini` lee el texto, llama a Gemini y guarda JSON en `data/json/`. `ValidadorJSON` comprueba el contrato.
 5. El alumno completa el vault en `obsidian_vault/`.
 
-Clases principales: diagrama PlantUML en [docs/diseno-poo.puml](docs/diseno-poo.puml) (imagen [docs/diseno-poo.png](docs/diseno-poo.png) incluida en la presentación). Regenerar:
-
-```bash
-cd docs
-plantuml -tpng diseno-poo.puml
-# o: curl -sS -X POST --data-binary @diseno-poo.puml https://kroki.io/plantuml/png -o diseno-poo.png
-```
+Clases principales: `PipelineLaboratorio` coordina descubridor, fábrica de capturadores, extractor Gemini, validador y escritor Obsidian.
 
 ## Contrato JSON
 
@@ -130,20 +124,7 @@ Las URLs de prensa cambian con el tiempo. Si una descarga falla, el lote contin�
 
 ## Presentación del laboratorio
 
-Fuentes LaTeX en `docs/` (tema Auriga).
-
-- Lab 01: [docs/lab-noticias-obsidian.tex](docs/lab-noticias-obsidian.tex)
-- Lab 02: [docs/lab-noticias-obsidian02.tex](docs/lab-noticias-obsidian02.tex)
-
-El diagrama de clases es `diseno-poo.png` (junto al `.tex`). Compilación:
-
-```bash
-cd docs
-pdflatex lab-noticias-obsidian.tex
-pdflatex lab-noticias-obsidian02.tex
-```
-
-Si usa LuaLaTeX y tiene las fuentes Raleway / Lato / Hack, el tema las cargará. Con pdfLaTeX se usan las fuentes por defecto, sin cambiar colores ni layout.
+Las presentaciones Beamer y los Colab viven en `docs/` **solo en la copia local** (la carpeta está en `.gitignore` y no se publica en GitHub).
 
 ## Estructura del repositorio
 

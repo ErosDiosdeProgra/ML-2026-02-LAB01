@@ -32,18 +32,8 @@ data/json/*.json
 obsidian_vault/**/*.md
 !obsidian_vault/**/.gitkeep
 
-# LaTeX
-# docs/*.aux
-# docs/*.log
-# docs/*.nav
-# docs/*.out
-# docs/*.snm
-# docs/*.toc
-# docs/*.vrb
-# docs/*.fls
-# docs/*.fdb_latexmk
-# docs/*.synctex.gz
-docs/ .gitkeep
+# Material docente local (no subir a GitHub)
+docs/
 
 # Sistema
 .DS_Store
