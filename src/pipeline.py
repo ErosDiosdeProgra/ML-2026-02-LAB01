@@ -1,7 +1,7 @@
 """Orquestación OOP del laboratorio (CRISP-DM adaptado).
 
-Etapas implementadas: descubrimiento (Google News) y captura/limpieza.
-Etapas pendientes del alumno: extracción LLM, vault Obsidian y análisis.
+Etapas implementadas: descubrimiento, captura/limpieza y extracción Gemini.
+Etapas pendientes del alumno: vault Obsidian y análisis.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from src.adquisicion.google_news import DescubridorGoogleNews
 from src.adquisicion.http import ClienteHTTP
 from src.adquisicion.repositorio import RepositorioNoticias
 from src.analisis.explorador import ExploradorDatos
-from src.config import RUTA_URLS
+from src.config import DIR_JSON, GEMINI_API_KEY, RUTA_URLS
 from src.conocimiento.obsidian import EscritorVaultObsidian
 from src.excepciones import EtapaPendienteAlumno
 from src.extraccion.gemini import ExtractorGemini
@@ -113,18 +113,41 @@ class PipelineLaboratorio:
         print(f"Captura finalizada: {ok} ok, {fallos} fallos, {len(noticias)} total")
         return ok, fallos
 
-    def ejecutar_extraccion(self) -> None:
-        """TODO(alumno): Gemini + validación JSON."""
+    def ejecutar_extraccion(self) -> tuple[int, int]:
+        """Gemini + validación JSON → data/json/{id_noticia}.json."""
         print("== Etapa: extraer (Gemini) ==")
         noticias = self._leer_urls()
-        try:
-            for noticia in noticias:
+        if not GEMINI_API_KEY:
+            print(
+                "Falta GEMINI_API_KEY. Copie .env.example a .env y complete la clave. "
+                "Nunca suba .env a GitHub."
+            )
+            return 0, len(noticias)
+
+        ok, fallos = 0, 0
+        for noticia in noticias:
+            print(f"  [{noticia.id_noticia}] {noticia.fuente}")
+            try:
                 noticia.texto_limpio = self.repositorio.leer_texto(noticia.id_noticia)
+                if not (noticia.texto_limpio or "").strip():
+                    print("    Texto vacío; se omite.")
+                    fallos += 1
+                    continue
                 self.extractor.extraer(noticia)
-        except EtapaPendienteAlumno as pendiente:
-            print(pendiente)
-        except FileNotFoundError:
-            print("No hay textos en data/processed/. Ejecute primero: python main.py capturar")
+                self.validador.validar(DIR_JSON / f"{noticia.id_noticia}.json")
+                print("    OK: JSON validado")
+                ok += 1
+            except FileNotFoundError:
+                fallos += 1
+                print(
+                    "    No hay texto en data/processed/. "
+                    "Ejecute primero: python main.py capturar"
+                )
+            except Exception as exc:  # noqa: BLE001 — una noticia no debe tumbar el lote
+                fallos += 1
+                print(f"    Error: {exc}")
+        print(f"Extracción finalizada: {ok} ok, {fallos} fallos, {len(noticias)} total")
+        return ok, fallos
 
     def ejecutar_obsidian(self) -> None:
         """TODO(alumno): JSON → notas Markdown enlazadas."""
