@@ -1,5 +1,51 @@
 id_noticia,fuente,url,categoria_busqueda
-N001,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/01/investigan-asesinato-en-san-ramon-hombre-muere-tras-ataque-a-tiros-en-poblacion-la-bandera.shtml,homicidio
-N002,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/drogas/pdi-desbarato-red-de-narcotrafico-en-los-rios-12-detenidos-y-150-kilos/2026-08-21/123148.html,trafico_drogas
-N003,LaTercera,https://www.latercera.com/nacional/noticia/pdi-detuvo-a-dos-colombianos-por-el-crimen-el-presunto-ajuste-de-cuentas-narco-detras-de-horroroso-homicidio-en-curacavi/,homicidio
-N004,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/drogas/cayo-narcobanda-en-maipu-y-recoleta-ocultaban-la-mercancia-en-la-rueda/2026-08-30/133248.html,trafico_drogas
+N001,LaTercera,https://www.latercera.com/nacional/noticia/estamos-revisando-minvu-reconoce-fallas-en-controles-del-serviu-tras-auditoria-de-contraloria-por-subsidios-de-arriendo/?outputType=base-amp-type,Vivienda y subsidios
+N002,BioBioChile,https://www.biobiochile.cl/noticias/nacional/chile/2026/08/25/minvu-ordena-sumario-por-subsidios-de-arriendo-a-fallecidos-y-otras-irregularidades-detectadas-por-cgr.shtml,Vivienda y subsidios
+N003,BioBioChile,https://www.biobiochile.cl/noticias/servicios/beneficios/2026/09/08/inicia-postulacion-a-subsidio-de-arriendo-que-cubre-hasta-90-del-valor-revisa-quienes-pueden-acceder.shtml,Vivienda y subsidios
+N004,LaTercera,https://www.latercera.com/nacional/noticia/ministros-marin-y-poduje-anuncian-nuevo-beneficio-para-que-25-mil-jefas-de-hogar-financien-reparaciones-de-sus-viviendas/,Vivienda y subsidios
+N005,Cooperativa,https://www.cooperativa.cl/noticias/pais/vivienda/fonavi-quienes-podran-acceder-y-como-rebajara-el-pie-y-los-dividendos/2026-09-11/085106.html,Vivienda y financiamiento
+N006,Cooperativa,https://www.cooperativa.cl/noticias/pais/vivienda/presidente-kast-presento-proyecto-para-facilitar-el-financiamiento-de-la/2026-09-09/140006.html,Vivienda y financiamiento
+N007,LaTercera,https://www.latercera.com/pulso/noticia/gobierno-busca-extender-el-subsidio-a-la-tasa-de-interes-del-credito-hipotecario-para-viviendas-de-hasta-6000-uf/,Vivienda y financiamiento
+N008,BioBioChile,https://www.biobiochile.cl/noticias/servicios/beneficios/2026/08/26/gobierno-promulga-ampliacion-del-fogaes-valor-de-viviendas-podra-ser-de-hasta-6-000-uf.shtml,Vivienda y financiamiento
+N009,Emol,https://www.emol.com/noticias/Nacional/2026/08/11/1208224/senado-despacha-ley-subsidio-hipotecarias.html,Vivienda y financiamiento
+N010,Emol,https://www.emol.com/noticias/Economia/2026/08/04/1207520/gobierno-ampliar-tasa-hipotecaria.html,Vivienda y financiamiento
+N011,BioBioChile,https://www.biobiochile.cl/noticias/nacional/chile/2026/08/24/minvu-anuncia-programa-de-mejoramiento-de-viviendas-y-barrios-generara-cerca-de-20-mil-empleos.shtml,Vivienda y subsidios
+N012,LaTercera,https://www.latercera.com/sustentabilidad/noticia/aguas-andinas-y-minvu-suscriben-convenio-que-agilizara-la-habilitacion-de-terrenos-para-la-vivienda-social-en-la-region-metropolitana/,Vivienda y déficit habitacional
+N013,Cooperativa,https://www.cooperativa.cl/noticias/pais/vivienda/viviendas-sociales/gremio-advierte-caida-de-obras-de-viviendas-sociales-no-tendremos/2026-09-02/175256.html,Vivienda y déficit habitacional
+N014,Emol,https://www.emol.com/noticias/Nacional/2026/09/12/1211304/poduje-viviendas-sociales-carlos-marambio.html,Vivienda y déficit habitacional
+N015,LaTercera,https://www.latercera.com/nacional/noticia/minvu-anuncia-plan-para-tarapaca-con-foco-en-socavones-nuevas-viviendas-y-desalojos-de-tomas/?outputType=base-amp-type,Vivienda y déficit habitacional
+N016,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/07/incendio-en-campamento-de-san-bernardo-deja-al-menos-70-viviendas-y-280-personas-afectadas.shtml,Vivienda y emergencias
+N017,Emol,https://www.emol.com/noticias/Nacional/2026/09/07/1210768/incendio-campamento-san-bernardo-viviendas.html,Vivienda y emergencias
+N018,Cooperativa,https://www.cooperativa.cl/noticias/pais/region-de-antofagasta/minvu-comenzo-catastro-de-viviendas-danadas-tras-el-aluvion-en-tocopilla/2026-09-03/143427.html,Vivienda y emergencias
+N019,BioBioChile,https://www.biobiochile.cl/noticias/nacional/chile/2026/09/09/homicidios-en-chile-se-mantienen-a-la-baja-en-2026-pero-aumenta-la-relacion-con-el-crimen-organizado.shtml,Crimen y seguridad
+N020,Emol,https://www.emol.com/noticias/Nacional/2026/09/09/1210977/homicidios-chile-primer-semestre-2026.html,Crimen y seguridad
+N021,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/16/dos-menores-de-16-anos-detenidos-por-robo-y-asesinato-de-hombre-que-encumbraba-volantines-en-colina.shtml,Crimen y seguridad
+N022,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/homicidios/joven-que-elevaba-volantin-fue-asesinado-al-resistirse-a-robo-en-colina/2026-09-14/073022.html,Crimen y seguridad
+N023,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/homicidios/la-serena-hombre-fue-asesinado-tras-robo-al-interior-de-su-casa/2026-09-08/101832.html,Crimen y seguridad
+N024,Emol,https://www.emol.com/noticias/Nacional/2026/09/08/1210872/hombre-asesinado-la-serena-robo.html,Crimen y seguridad
+N025,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/15/al-menos-9-detenidos-por-robo-de-vehiculo-que-termino-con-mujer-atropellada-en-maipu.shtml,Crimen y seguridad
+N026,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/05/detienen-a-tres-sujetos-por-robo-de-celulares-avaluados-en-500-millones-desde-compania-de-envios.shtml,Crimen y seguridad
+N027,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/04/amplian-detencion-de-tres-imputados-por-robo-y-persecucion-que-termino-con-muerte-de-pizzero-en-maipu.shtml,Crimen y seguridad
+N028,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/10/robo-de-cajas-de-carne-a-punta-de-pistolas-desata-intercambio-de-disparos-con-carabineros-en-recoleta.shtml,Crimen y seguridad
+N029,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/09/13/robaron-camion-con-6-toneladas-de-carne-y-la-ofrecieron-por-facebook-hay-13-detenidos.shtml,Crimen y seguridad
+N030,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/08/29/detienen-a-tres-personas-en-caso-de-carabinero-asesinado-en-renca-autores-materiales-siguen-profugos.shtml,Crimen y seguridad
+N031,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/08/20/dos-detenidos-por-desaparicion-de-makarena-toloza-en-la-rm-se-trata-de-un-secuestro-con-homicidio.shtml,Crimen y seguridad
+N032,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/robos/cuatro-detenidos-dejo-millonario-robo-a-bodega-en-pudahuel/2026-08-04/073509.html,Crimen y seguridad
+N033,Cooperativa,https://www.cooperativa.cl/noticias/pais/policial/dos-detenidos-por-intento-de-robo-en-jardin-infantil-clausurado-en/2026-08-15/123644.html,Crimen y seguridad
+N034,BioBioChile,https://www.biobiochile.cl/noticias/nacional/chile/2026/08/24/ministro-arrau-destaca-caida-de-cifras-de-homicidios-pero-advierte-que-no-hay-exitismos.shtml,Crimen y seguridad
+N035,Cooperativa,https://www.cooperativa.cl/noticias/pais/region-de-antofagasta/aluvion-en-tocopilla-reportan-tres-personas-desaparecidas/2026-08-18/130459.html,Desastres naturales y emergencias
+N036,Cooperativa,https://www.cooperativa.cl/noticias/pais/region-de-antofagasta/vecinos-registraron-fuerza-del-aluvion-que-afecto-a-tocopilla/2026-08-18/134033.html,Desastres naturales y emergencias
+N037,Cooperativa,https://www.cooperativa.cl/noticias/pais/desastres-naturales/damnificados-por-los-aluviones-entre-el-barro-que-se-endurece-y-la/2026-08-20/132418.html,Desastres naturales y emergencias
+N038,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2026/09/06/incendio-afecta-a-casona-ubicada-en-el-cerro-cordillera-en-valparaiso.shtml,Incendios y emergencias
+N039,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2026/09/15/al-menos-una-casa-destruida-deja-incendio-en-sector-playa-ancha-de-valparaiso.shtml,Incendios y emergencias
+N040,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2026/08/05/gigantesco-incendio-en-empresa-de-quilicura-supera-las-10-horas-de-combate-hay-clases-suspendidas.shtml,Incendios y emergencias
+N041,Emol,https://www.emol.com/noticias/Nacional/2026/08/05/1207620/fotos-incendio-quilicura-empresa-quimicos.html,Incendios y emergencias
+N042,Emol,https://www.emol.com/noticias/Nacional/2026/08/05/1207656/incendio-empresa-quilicura-delegado-codina.html,Incendios y emergencias
+N043,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2026/08/06/dos-muertos-y-nueve-damnificados-deja-incendio-de-viviendas-en-hualqui-victimas-serian-madre-e-hijo.shtml,Incendios y emergencias
+N044,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2026/08/05/dalcahue-voraz-incendio-deja-una-persona-fallecida-dos-cinco-damnificados-y-dos-bomberos-lesionados.shtml,Incendios y emergencias
+N045,BioBioChile,https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2026/08/28/una-persona-muerta-deja-incendio-de-una-vivienda-en-sector-los-naranjos-de-santa-barbara.shtml,Incendios y emergencias
+N046,Emol,https://www.emol.com/noticias/Economia/2026/08/28/1209827/desempleo-en-chile-informalidad.html,Economía y empleo
+N047,Emol,https://www.emol.com/noticias/Economia/2026/09/07/1210735/mercado-laboral-empleo-desempleo.html,Economía y empleo
+N048,BioBioChile,https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/09/08/gobierno-apunta-a-efecto-de-bencinas-y-lluvias-en-el-ipc-reconoce-impacto-al-bolsillo-de-las-familias.shtml,Economía
+N049,BioBioChile,https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/09/09/banco-central-alerta-sobre-debilidad-economica-de-chile-y-recorta-con-fuerza-proyeccion-de-crecimiento.shtml,Economía
+N050,BioBioChile,https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/09/15/gobierno-prepara-plan-urgente-para-frenar-el-alza-del-desempleo-y-surgen-criticas-a-posible-fast-track.shtml,Economía y empleo

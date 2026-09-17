@@ -1,7 +1,8 @@
 """Orquestación OOP del laboratorio (CRISP-DM adaptado).
 
-Etapas implementadas: descubrimiento, captura/limpieza y extracción Gemini.
-Etapas pendientes del alumno: vault Obsidian y análisis.
+Etapas implementadas: descubrimiento, captura/limpieza, extracción Gemini
+y generación del vault Obsidian. Pendiente del alumno: análisis / Data
+Understanding.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from src.adquisicion.http import ClienteHTTP
 from src.adquisicion.repositorio import RepositorioNoticias
 from src.analisis.explorador import ExploradorDatos
 from src.config import DIR_JSON, GEMINI_API_KEY, RUTA_URLS
-from src.conocimiento.obsidian import EscritorVaultObsidian
+from src.conocimiento.obsidian import EscritorVaultObsidian, cargar_noticias_desde_disco
 from src.excepciones import EtapaPendienteAlumno
 from src.extraccion.gemini import ExtractorGemini
 from src.limpieza.limpiador import LimpiadorHTML
@@ -150,12 +151,23 @@ class PipelineLaboratorio:
         return ok, fallos
 
     def ejecutar_obsidian(self) -> None:
-        """TODO(alumno): JSON → notas Markdown enlazadas."""
+        """JSON validado → notas Markdown enlazadas en obsidian_vault/."""
         print("== Etapa: obsidian (vault) ==")
-        try:
-            self.escritor.escribir_vault([])
-        except EtapaPendienteAlumno as pendiente:
-            print(pendiente)
+        noticias = cargar_noticias_desde_disco(DIR_JSON)
+        if not noticias:
+            print(
+                "No hay JSON en data/json/. Ejecute primero: python main.py extraer "
+                "(requiere GEMINI_API_KEY en .env)."
+            )
+            return
+        self.escritor.escribir_vault(noticias)
+        total_notas = sum(
+            len(list(sub.iterdir())) for sub in self.escritor.vault.iterdir() if sub.is_dir()
+        )
+        print(
+            f"Vault generado en {self.escritor.vault} "
+            f"({len(noticias)} noticias, {total_notas} notas)."
+        )
 
     def ejecutar_analisis(self) -> None:
         """TODO(alumno): Data Understanding y visualizaciones."""
