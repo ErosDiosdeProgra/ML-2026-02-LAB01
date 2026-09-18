@@ -56,6 +56,8 @@ class ExtractorGemini(ExtractorLLM):
         "objetos",
         "relaciones",
     ]
+    MAX_CARACTERES_TEXTO = 24_000
+    MAX_INTENTOS = 3
 
     def __init__(self, dir_json: Path = DIR_JSON) -> None:
         self.dir_json = dir_json
@@ -65,12 +67,18 @@ class ExtractorGemini(ExtractorLLM):
     def construir_prompt(self, noticia: NoticiaFuente) -> str:
         campos = ", ".join(self.CAMPOS_OBLIGATORIOS)
         texto = (noticia.texto_limpio or "").strip()
+        if len(texto) > self.MAX_CARACTERES_TEXTO:
+            texto = texto[: self.MAX_CARACTERES_TEXTO]
         return (
             "Analiza la siguiente noticia delictual.\n\n"
-            "Extrae solamente informacion explicita. No inventes datos, "
-            "entidades, roles ni relaciones.\n"
+            "Extrae solamente información explícita. No inventes datos, "
+            "entidades, roles, fechas ni relaciones. Un detenido, imputado, "
+            "acusado, condenado, víctima o testigo debe conservar exactamente "
+            "el rol que indica el texto; no infieras culpabilidad.\n"
             "Devuelve exclusivamente JSON valido, sin markdown ni explicaciones.\n\n"
             f"Campos obligatorios: {campos}.\n"
+            "titulo, fecha_publicacion y resumen pueden ser null.\n"
+            "delitos, organizaciones y lugares son listas de strings.\n"
             "personas: lista de objetos con claves nombre y rol.\n"
             "objetos: lista de objetos con claves tipo, nombre, cantidad, unidad.\n"
             "relaciones: lista de objetos con claves origen, tipo, destino.\n"
@@ -91,18 +99,7 @@ class ExtractorGemini(ExtractorLLM):
         cliente = self._obtener_cliente()
         from google.genai import types
 
-        # TODO(alumno): recortar textos muy largos; reintentos ante 429 / timeouts.
-        respuesta = cliente.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=self.construir_prompt(noticia),
-            config=types.GenerateContentConfig(
-                automatic_function_calling=types.AutomaticFunctionCallingConfig(
-                    disable=True
-                ),
-                response_mime_type="application/json",
-                temperature=0,
-            ),
-        )
+        respuesta = self._consultar_con_reintentos(cliente, types, noticia)
         bruto = (getattr(respuesta, "text", None) or "").strip()
         if not bruto:
             raise ValueError(
@@ -121,6 +118,32 @@ class ExtractorGemini(ExtractorLLM):
         )
         time.sleep(PAUSA_ENTRE_REQUESTS)
         return data
+
+    def _consultar_con_reintentos(self, cliente, types, noticia: NoticiaFuente):
+        """Reintenta fallos transitorios sin duplicar la escritura del JSON."""
+        ultimo_error: Exception | None = None
+        for intento in range(1, self.MAX_INTENTOS + 1):
+            try:
+                return cliente.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=self.construir_prompt(noticia),
+                    config=types.GenerateContentConfig(
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                        response_mime_type="application/json",
+                        temperature=0,
+                    ),
+                )
+            except Exception as exc:  # La SDK usa distintas excepciones según versión.
+                ultimo_error = exc
+                if intento == self.MAX_INTENTOS:
+                    break
+                espera = 2 ** (intento - 1)
+                print(f"    Gemini falló (intento {intento}/{self.MAX_INTENTOS}); reintentando en {espera}s.")
+                time.sleep(espera)
+        raise RuntimeError(
+            f"Gemini no respondió después de {self.MAX_INTENTOS} intentos para "
+            f"{noticia.id_noticia}: {ultimo_error}"
+        ) from ultimo_error
 
     def _obtener_cliente(self):
         if self._cliente is None:

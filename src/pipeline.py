@@ -17,7 +17,6 @@ from src.adquisicion.repositorio import RepositorioNoticias
 from src.analisis.explorador import ExploradorDatos
 from src.config import DIR_JSON, GEMINI_API_KEY, RUTA_URLS
 from src.conocimiento.obsidian import EscritorVaultObsidian, cargar_noticias_desde_disco
-from src.excepciones import EtapaPendienteAlumno
 from src.extraccion.gemini import ExtractorGemini
 from src.limpieza.limpiador import LimpiadorHTML
 from src.modelos import NoticiaFuente
@@ -170,15 +169,12 @@ class PipelineLaboratorio:
         )
 
     def ejecutar_analisis(self) -> None:
-        """TODO(alumno): Data Understanding y visualizaciones."""
+        """Genera gráficos de cobertura y calidad para Data Understanding."""
         print("== Etapa: analizar (Data Understanding) ==")
-        try:
-            self.explorador.ejecutar()
-        except EtapaPendienteAlumno as pendiente:
-            print(pendiente)
+        self.explorador.ejecutar()
 
     def ejecutar_pipeline(self) -> None:
-        """Corre lo implementado y avisa las etapas que el alumno debe completar."""
+        """Corre todas las etapas implementadas del laboratorio."""
         self.ejecutar_descubrimiento()
         self.ejecutar_captura()
         self.ejecutar_extraccion()

@@ -1,57 +1,121 @@
 """Data Understanding sobre el corpus estructurado.
 
-TODO(alumno): las visualizaciones no son decoración; deben revelar
-cobertura, sesgos y problemas de calidad (nulos, JSON inválidos, nombres
-inconsistentes).
+Los gráficos se guardan en ``data/analisis`` para poder incorporarlos al
+informe sin depender de una ventana interactiva de matplotlib.
 """
 
 from __future__ import annotations
 
-from src.excepciones import EtapaPendienteAlumno
+import json
+from pathlib import Path
+
+import matplotlib
+
+# El laboratorio también debe funcionar desde terminal o PyCharm sin display.
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from src.config import DIR_JSON, RUTA_URLS
 
 
 class ExploradorDatos:
     """Estadísticas y gráficos mínimos del laboratorio."""
 
-    def noticias_por_fuente(self) -> None:
-        # TODO(alumno): gráfico de barras con pandas + matplotlib.
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.noticias_por_fuente",
-            pista="Cuente noticias por la columna fuente (urls.csv o JSON).",
-        )
+    def __init__(
+        self,
+        dir_json: Path = DIR_JSON,
+        ruta_urls: Path = RUTA_URLS,
+        dir_salida: Path | None = None,
+    ) -> None:
+        self.dir_json = Path(dir_json)
+        self.ruta_urls = Path(ruta_urls)
+        self.dir_salida = Path(dir_salida) if dir_salida else self.dir_json.parent / "analisis"
+        self.dir_salida.mkdir(parents=True, exist_ok=True)
 
-    def delitos_frecuentes(self) -> None:
-        # TODO(alumno): top 10 delitos a partir de data/json/*.json.
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.delitos_frecuentes",
-            pista="Aplane la lista delitos de cada JSON y use value_counts().",
-        )
+    def _cargar_noticias(self) -> list[dict]:
+        """Carga solo objetos JSON legibles; informa archivos defectuosos."""
+        noticias: list[dict] = []
+        invalidos: list[str] = []
+        for ruta in sorted(self.dir_json.glob("*.json")):
+            try:
+                data = json.loads(ruta.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    noticias.append(data)
+                else:
+                    invalidos.append(ruta.name)
+            except (OSError, json.JSONDecodeError):
+                invalidos.append(ruta.name)
+        if invalidos:
+            print(f"JSON omitidos por formato inválido: {', '.join(invalidos)}")
+        return noticias
 
-    def lugares_frecuentes(self) -> None:
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.lugares_frecuentes",
-            pista="Cuente menciones de comunas/regiones y grafique las más frecuentes.",
-        )
+    def _guardar_barras(self, series: pd.Series, titulo: str, nombre: str, xlabel: str) -> Path | None:
+        if series.empty:
+            print(f"Sin datos para: {titulo}.")
+            return None
+        fig, ax = plt.subplots(figsize=(9, 5))
+        series.sort_values().plot.barh(ax=ax, color="#2c7fb8")
+        ax.set_title(titulo)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("")
+        fig.tight_layout()
+        ruta = self.dir_salida / nombre
+        fig.savefig(ruta, dpi=160)
+        plt.close(fig)
+        print(f"Gráfico guardado: {ruta}")
+        return ruta
 
-    def campos_faltantes(self) -> None:
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.campos_faltantes",
-            pista="Calcule el porcentaje de null/listas vacías por campo del JSON.",
-        )
+    def noticias_por_fuente(self) -> pd.Series:
+        """Cuenta la cobertura por medio desde los JSON o, si faltan, URLs."""
+        noticias = self._cargar_noticias()
+        fuentes = [n.get("fuente") for n in noticias if n.get("fuente")]
+        if not fuentes and self.ruta_urls.exists():
+            fuentes = pd.read_csv(self.ruta_urls).get("fuente", pd.Series(dtype=str)).dropna().tolist()
+        serie = pd.Series(fuentes, dtype="object").value_counts()
+        self._guardar_barras(serie, "Noticias por fuente", "noticias_por_fuente.png", "Noticias")
+        return serie
 
-    def evolucion_temporal(self) -> None:
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.evolucion_temporal",
-            pista="Si fecha_publicacion está disponible, grafique noticias por mes.",
-        )
+    def delitos_frecuentes(self) -> pd.Series:
+        delitos = [d for n in self._cargar_noticias() for d in n.get("delitos", []) if isinstance(d, str) and d.strip()]
+        serie = pd.Series(delitos, dtype="object").value_counts().head(10)
+        self._guardar_barras(serie, "Top 10 delitos mencionados", "delitos_frecuentes.png", "Menciones")
+        return serie
 
-    def ejecutar(self) -> None:
+    def lugares_frecuentes(self) -> pd.Series:
+        lugares = [l for n in self._cargar_noticias() for l in n.get("lugares", []) if isinstance(l, str) and l.strip()]
+        serie = pd.Series(lugares, dtype="object").value_counts().head(10)
+        self._guardar_barras(serie, "Top 10 lugares mencionados", "lugares_frecuentes.png", "Menciones")
+        return serie
+
+    def campos_faltantes(self) -> pd.Series:
+        noticias = self._cargar_noticias()
+        campos = ("titulo", "fecha_publicacion", "fuente", "url", "resumen", "delitos", "personas", "organizaciones", "lugares", "objetos", "relaciones")
+        if not noticias:
+            return pd.Series(dtype=float)
+        faltantes = {campo: sum(n.get(campo) is None or n.get(campo) == "" or n.get(campo) == [] for n in noticias) * 100 / len(noticias) for campo in campos}
+        serie = pd.Series(faltantes).sort_values(ascending=False)
+        self._guardar_barras(serie, "Campos faltantes", "campos_faltantes.png", "Porcentaje de noticias")
+        return serie
+
+    def evolucion_temporal(self) -> pd.Series:
+        fechas = pd.to_datetime([n.get("fecha_publicacion") for n in self._cargar_noticias()], errors="coerce")
+        serie = pd.Series(fechas).dropna().dt.to_period("M").value_counts().sort_index()
+        serie.index = serie.index.astype(str)
+        self._guardar_barras(serie, "Noticias por mes", "evolucion_temporal.png", "Noticias")
+        return serie
+
+    def ejecutar(self) -> dict[str, pd.Series]:
         """Corre todas las visualizaciones pedidas en la guía."""
-        raise EtapaPendienteAlumno(
-            modulo="src.analisis.explorador.ExploradorDatos.ejecutar",
-            pista=(
-                "Implemente y llame a noticias_por_fuente, delitos_frecuentes, "
-                "lugares_frecuentes, campos_faltantes y evolucion_temporal. "
-                "Interprete cada gráfico en el informe."
-            ),
-        )
+        if not self._cargar_noticias() and not self.ruta_urls.exists():
+            print("No hay datos: ejecute capturar y extraer antes de analizar.")
+            return {}
+        resultados = {
+            "noticias_por_fuente": self.noticias_por_fuente(),
+            "delitos_frecuentes": self.delitos_frecuentes(),
+            "lugares_frecuentes": self.lugares_frecuentes(),
+            "campos_faltantes": self.campos_faltantes(),
+            "evolucion_temporal": self.evolucion_temporal(),
+        }
+        print(f"Análisis finalizado. Resultados en: {self.dir_salida}")
+        return resultados

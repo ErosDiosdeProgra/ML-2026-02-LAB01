@@ -5,7 +5,7 @@ Pipeline académico para transformar **noticias delictuales no estructuradas** e
 El repositorio cubre dos entregas:
 
 1. **Lab 01:** captura (Google News + medios chilenos) y limpieza de texto.
-2. **Lab 02:** extracción con Gemini, validación JSON y **vault de Obsidian**. La **visualización / Data Understanding** sigue siendo `TODO(alumno)`.
+2. **Lab 02:** extracción con Gemini, validación JSON, **vault de Obsidian** y gráficos de **Data Understanding**.
 
 La implementación de Gemini es **mínima y ejecutable**: el alumno debe mejorar el prompt, el parseo y el manejo de errores.
 
@@ -48,8 +48,8 @@ python main.py descubrir   # RSS de Google News → actualiza data/urls.csv
 python main.py capturar    # URLs → data/raw/*.html y data/processed/*.txt
 python main.py extraer     # Gemini → data/json/*.json (requiere GEMINI_API_KEY)
 python main.py obsidian    # data/json/*.json → vault Markdown (obsidian_vault/)
-python main.py analizar    # TODO(alumno): Data Understanding
-python main.py pipeline    # descubrir + capturar + extraer; avisa etapas pendientes
+python main.py analizar    # gráficos de Data Understanding → data/analisis/
+python main.py pipeline    # flujo completo
 ```
 
 El identificador `id_noticia` se conserva en todo el flujo: `N001.html` → `N001.txt` → `N001.json` → `Noticias/N001.md`.
@@ -65,10 +65,10 @@ El escritor de Obsidian se probó durante el desarrollo con un JSON de ejemplo, 
 | `src/modelos.py` | Listo | Dataclasses del contrato JSON |
 | `src/pipeline.py` + `main.py` | Listo | Orquestación por etapas |
 | `src/conocimiento/utilidades.py` | Listo | `slugify` y `[[wiki-links]]` |
-| `src/extraccion/` | Listo (simple) | Prompt + llamada a Gemini + `data/json/`; el alumno puede mejorarlo |
-| `src/validacion/` | Listo (simple) | `json.loads`, campos obligatorios y tipos lista |
+| `src/extraccion/` | Listo | Prompt estructurado, recorte de textos, reintentos y `data/json/` |
+| `src/validacion/` | Listo | JSON, campos obligatorios, tipos y resumen de calidad |
 | `src/conocimiento/obsidian.py` | Listo | Notas Markdown enlazadas por noticia y entidad + `00_Indice.md` |
-| `src/analisis/` | `TODO(alumno)` | Gráficos de calidad y cobertura |
+| `src/analisis/` | Listo | Cobertura por fuente, delitos, lugares, faltantes y evolución temporal |
 
 Si ejecuta una etapa pendiente, el programa imprime una pista y **no falla en silencio**.
 
