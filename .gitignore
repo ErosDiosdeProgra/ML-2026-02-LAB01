@@ -23,6 +23,7 @@ __pycache__/
 data/raw/*.html
 data/processed/*.txt
 data/json/*.json
+data/analisis/
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/json/.gitkeep

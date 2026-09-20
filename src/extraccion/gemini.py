@@ -3,9 +3,9 @@
 Implementación mínima y ejecutable. El laboratorio NO inventa datos:
 solo se extrae información explícita en la noticia, en JSON válido.
 
-TODO(alumno) — mejoras opcionales, el código ya corre sin ellas:
-- reintentos ante 429 / timeouts
-- recorte de textos muy largos antes del prompt
+Robustez implementada en este avance:
+- reintentos ante 429 / timeouts (MAX_INTENTOS con backoff exponencial)
+- recorte de textos muy largos antes del prompt (MAX_CARACTERES_TEXTO)
 """
 
 from __future__ import annotations

@@ -7,7 +7,8 @@ El repositorio cubre dos entregas:
 1. **Lab 01:** captura (Google News + medios chilenos) y limpieza de texto.
 2. **Lab 02:** extracción con Gemini, validación JSON, **vault de Obsidian** y gráficos de **Data Understanding**.
 
-La implementación de Gemini es **mínima y ejecutable**: el alumno debe mejorar el prompt, el parseo y el manejo de errores.
+La implementación de Gemini es **mínima y ejecutable**, con reintentos ante
+429/timeouts y recorte de textos largos ya incluidos.
 
 No se entrena clustering. Los grupos de noticias se forman por **relaciones explícitas** (mismo delito, persona, organización o lugar).
 
@@ -68,7 +69,7 @@ El escritor de Obsidian se probó durante el desarrollo con un JSON de ejemplo, 
 | `src/extraccion/` | Listo | Prompt estructurado, recorte de textos, reintentos y `data/json/` |
 | `src/validacion/` | Listo | JSON, campos obligatorios, tipos y resumen de calidad |
 | `src/conocimiento/obsidian.py` | Listo | Notas Markdown enlazadas por noticia y entidad + `00_Indice.md` |
-| `src/analisis/` | Listo | Cobertura por fuente, delitos, lugares, faltantes y evolución temporal |
+| `src/analisis/` | Listo | Cobertura por fuente y por categoría (tema), noticias con/sin delitos, delitos, lugares, faltantes y evolución temporal |
 
 Si ejecuta una etapa pendiente, el programa imprime una pista y **no falla en silencio**.
 

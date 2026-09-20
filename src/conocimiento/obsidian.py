@@ -502,7 +502,7 @@ class EscritorVaultObsidian(EscritorObsidian):
             bloques.append("")
 
         bloques.append(f"## Relaciones ({len(tipos_relacion)})")
-        bloques += [f"- {enlace_obsidian(t)}" for t in tipos_relacion] or [
+        bloques += [f"- {self._enlace(t)}" for t in tipos_relacion] or [
             "- _(sin datos aún)_"
         ]
         bloques.append("")

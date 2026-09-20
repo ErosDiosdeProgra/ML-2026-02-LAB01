@@ -20,6 +20,13 @@ from pathlib import Path
 # Permite `python main.py` sin instalar el paquete.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+# Consola Windows con cp1252 no puede imprimir "→" ni otros símbolos UTF-8.
+for flujo in (sys.stdout, sys.stderr):
+    try:
+        flujo.reconfigure(encoding="utf-8")
+    except (AttributeError, OSError):
+        pass
+
 from src.pipeline import PipelineLaboratorio  # noqa: E402
 
 

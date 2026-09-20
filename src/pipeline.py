@@ -1,7 +1,7 @@
 """Orquestación OOP del laboratorio (CRISP-DM adaptado).
 
 Etapas implementadas: descubrimiento, captura/limpieza, extracción Gemini
-y generación del vault Obsidian. Pendiente del alumno: análisis / Data
+con validación JSON, generación del vault Obsidian y análisis / Data
 Understanding.
 """
 

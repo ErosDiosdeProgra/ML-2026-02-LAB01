@@ -105,6 +105,40 @@ class ExploradorDatos:
         self._guardar_barras(serie, "Noticias por mes", "evolucion_temporal.png", "Noticias")
         return serie
 
+    def noticias_por_categoria(self) -> pd.Series:
+        """Distribución por tema usando `categoria_busqueda` de urls.csv.
+
+        Representa también las noticias no delictuales (vivienda, emergencias,
+        economía), que no aparecen en ``delitos_frecuentes``.
+        """
+        noticias = self._cargar_noticias()
+        categorias: dict[str, str] = {}
+        if self.ruta_urls.exists():
+            urls = pd.read_csv(self.ruta_urls)
+            if {"id_noticia", "categoria_busqueda"}.issubset(urls.columns):
+                categorias = dict(
+                    zip(urls["id_noticia"].astype(str), urls["categoria_busqueda"].fillna(""))
+                )
+        serie = pd.Series(
+            [categorias.get(str(n.get("id_noticia")), "") or "Sin categoría" for n in noticias],
+            dtype="object",
+        ).value_counts()
+        self._guardar_barras(serie, "Noticias por categoría", "noticias_por_categoria.png", "Noticias")
+        return serie
+
+    def cobertura_delictual(self) -> pd.Series:
+        """Cuenta noticias que mencionan delitos y las que no (vivienda, emergencias, etc.)."""
+        noticias = self._cargar_noticias()
+        if not noticias:
+            return pd.Series(dtype="object")
+        con = sum(bool(n.get("delitos")) for n in noticias)
+        serie = pd.Series(
+            {"Noticias con delitos": con, "Noticias sin delitos": len(noticias) - con},
+            dtype="object",
+        )
+        self._guardar_barras(serie, "Noticias con y sin delitos", "cobertura_delictual.png", "Noticias")
+        return serie
+
     def ejecutar(self) -> dict[str, pd.Series]:
         """Corre todas las visualizaciones pedidas en la guía."""
         if not self._cargar_noticias() and not self.ruta_urls.exists():
@@ -112,10 +146,20 @@ class ExploradorDatos:
             return {}
         resultados = {
             "noticias_por_fuente": self.noticias_por_fuente(),
+            "noticias_por_categoria": self.noticias_por_categoria(),
+            "cobertura_delictual": self.cobertura_delictual(),
             "delitos_frecuentes": self.delitos_frecuentes(),
             "lugares_frecuentes": self.lugares_frecuentes(),
             "campos_faltantes": self.campos_faltantes(),
             "evolucion_temporal": self.evolucion_temporal(),
         }
+        noticias = self._cargar_noticias()
+        if noticias:
+            con = sum(bool(n.get("delitos")) for n in noticias)
+            print(
+                f"Resumen: {len(noticias)} noticias; {con} mencionan delitos y "
+                f"{len(noticias) - con} son temas no delictuales "
+                f"(vivienda, emergencias, economía, etc.)."
+            )
         print(f"Análisis finalizado. Resultados en: {self.dir_salida}")
         return resultados
