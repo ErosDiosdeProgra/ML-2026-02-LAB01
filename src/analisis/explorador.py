@@ -7,6 +7,9 @@ informe sin depender de una ventana interactiva de matplotlib.
 from __future__ import annotations
 
 import json
+import re
+import unicodedata
+from collections import Counter
 from pathlib import Path
 
 import matplotlib
@@ -16,21 +19,35 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.config import DIR_JSON, RUTA_URLS
+from src.config import DIR_JSON, DIR_PROCESSED, RUTA_URLS
 
 
 class ExploradorDatos:
     """Estadísticas y gráficos mínimos del laboratorio."""
+
+    # Se usan solo para frecuencias léxicas, nunca para borrar palabras del
+    # texto enviado al LLM: allí destruirían contexto, negaciones y relaciones.
+    STOPWORDS_ES = {
+        "a", "al", "algo", "ante", "antes", "como", "con", "contra", "cual", "cuando",
+        "de", "del", "desde", "donde", "dos", "el", "ella", "ellos", "en", "entre",
+        "era", "es", "esa", "ese", "esta", "este", "fue", "ha", "han", "hasta", "la",
+        "las", "le", "les", "lo", "los", "más", "mi", "mientras", "no", "o", "para",
+        "pero", "por", "porque", "que", "quien", "se", "según", "ser", "si", "sin",
+        "sobre", "son", "su", "sus", "también", "te", "tiene", "todo", "tras", "tu",
+        "un", "una", "uno", "y", "ya", "año", "años", "día", "días", "sido", "tras",
+    }
 
     def __init__(
         self,
         dir_json: Path = DIR_JSON,
         ruta_urls: Path = RUTA_URLS,
         dir_salida: Path | None = None,
+        dir_processed: Path = DIR_PROCESSED,
     ) -> None:
         self.dir_json = Path(dir_json)
         self.ruta_urls = Path(ruta_urls)
         self.dir_salida = Path(dir_salida) if dir_salida else self.dir_json.parent / "analisis"
+        self.dir_processed = Path(dir_processed)
         self.dir_salida.mkdir(parents=True, exist_ok=True)
 
     def _cargar_noticias(self) -> list[dict]:
@@ -88,21 +105,45 @@ class ExploradorDatos:
         self._guardar_barras(serie, "Top 10 lugares mencionados", "lugares_frecuentes.png", "Menciones")
         return serie
 
-    def campos_faltantes(self) -> pd.Series:
-        noticias = self._cargar_noticias()
-        campos = ("titulo", "fecha_publicacion", "fuente", "url", "resumen", "delitos", "personas", "organizaciones", "lugares", "objetos", "relaciones")
-        if not noticias:
-            return pd.Series(dtype=float)
-        faltantes = {campo: sum(n.get(campo) is None or n.get(campo) == "" or n.get(campo) == [] for n in noticias) * 100 / len(noticias) for campo in campos}
-        serie = pd.Series(faltantes).sort_values(ascending=False)
-        self._guardar_barras(serie, "Campos faltantes", "campos_faltantes.png", "Porcentaje de noticias")
-        return serie
-
     def evolucion_temporal(self) -> pd.Series:
         fechas = pd.to_datetime([n.get("fecha_publicacion") for n in self._cargar_noticias()], errors="coerce")
         serie = pd.Series(fechas).dropna().dt.to_period("M").value_counts().sort_index()
         serie.index = serie.index.astype(str)
         self._guardar_barras(serie, "Noticias por mes", "evolucion_temporal.png", "Noticias")
+        return serie
+
+    @staticmethod
+    def _normalizar_token(token: str) -> str:
+        texto = unicodedata.normalize("NFKD", token.casefold())
+        return "".join(c for c in texto if not unicodedata.combining(c))
+
+    def terminos_frecuentes(self) -> pd.Series:
+        """Top de palabras significativas usando stopwords en el análisis."""
+        conteos: Counter[str] = Counter()
+        stopwords = {self._normalizar_token(palabra) for palabra in self.STOPWORDS_ES}
+        for ruta in sorted(self.dir_processed.glob("*.txt")):
+            try:
+                texto = ruta.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for token in re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3,}", texto):
+                palabra = self._normalizar_token(token)
+                if palabra not in stopwords:
+                    conteos[palabra] += 1
+        serie = pd.Series(dict(conteos.most_common(15)), dtype="int64")
+        self._guardar_barras(serie, "Términos frecuentes sin stopwords", "terminos_frecuentes.png", "Apariciones")
+        return serie
+
+    def roles_frecuentes(self) -> pd.Series:
+        """Muestra cómo se distribuyen los roles extraídos de personas."""
+        roles = [
+            persona.get("rol")
+            for noticia in self._cargar_noticias()
+            for persona in noticia.get("personas", [])
+            if isinstance(persona, dict) and isinstance(persona.get("rol"), str) and persona["rol"].strip()
+        ]
+        serie = pd.Series(roles, dtype="object").value_counts().head(10)
+        self._guardar_barras(serie, "Roles de personas extraídos", "roles_frecuentes.png", "Menciones")
         return serie
 
     def noticias_por_categoria(self) -> pd.Series:
@@ -150,8 +191,9 @@ class ExploradorDatos:
             "cobertura_delictual": self.cobertura_delictual(),
             "delitos_frecuentes": self.delitos_frecuentes(),
             "lugares_frecuentes": self.lugares_frecuentes(),
-            "campos_faltantes": self.campos_faltantes(),
             "evolucion_temporal": self.evolucion_temporal(),
+            "terminos_frecuentes": self.terminos_frecuentes(),
+            "roles_frecuentes": self.roles_frecuentes(),
         }
         noticias = self._cargar_noticias()
         if noticias:

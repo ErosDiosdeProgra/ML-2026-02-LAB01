@@ -38,3 +38,4 @@ docs/
 # Sistema
 .DS_Store
 *.swp
+.idea/

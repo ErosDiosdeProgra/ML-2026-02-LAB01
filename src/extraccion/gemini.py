@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import re
 import time
+import unicodedata
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -82,6 +83,13 @@ class ExtractorGemini(ExtractorLLM):
             "personas: lista de objetos con claves nombre y rol.\n"
             "objetos: lista de objetos con claves tipo, nombre, cantidad, unidad.\n"
             "relaciones: lista de objetos con claves origen, tipo, destino.\n"
+            "NORMALIZACIÓN DE ENTIDADES: usa una única forma canónica por entidad "
+            "en toda la respuesta. Para personas, usa el nombre completo tal como "
+            "aparece por primera vez y sin títulos (por ejemplo, usa 'María Pérez', "
+            "no 'Sra. María Pérez' ni 'María Perez'). Reutiliza exactamente esa misma "
+            "forma en personas y relaciones. No repitas una entidad por cambios de "
+            "mayúsculas, tildes, espacios o abreviaciones. Si el texto no permite "
+            "saber que dos menciones se refieren a la misma entidad, mantenlas separadas.\n"
             "Si un dato no aparece, usa null o una lista vacia.\n\n"
             f"id_noticia: {noticia.id_noticia}\n"
             f"fuente: {noticia.fuente}\n"
@@ -111,12 +119,93 @@ class ExtractorGemini(ExtractorLLM):
             data["fuente"] = noticia.fuente
         if not data.get("url"):
             data["url"] = noticia.url
+        data = self._deduplicar_entidades(data)
         ruta = self.dir_json / f"{noticia.id_noticia}.json"
         ruta.write_text(
             json.dumps(data, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
         time.sleep(PAUSA_ENTRE_REQUESTS)
+        return data
+
+    @staticmethod
+    def _clave_entidad(valor: object) -> str:
+        """Clave conservadora: iguala solo tildes, espacios y mayúsculas."""
+        texto = " ".join(str(valor or "").split()).casefold()
+        return "".join(
+            caracter
+            for caracter in unicodedata.normalize("NFKD", texto)
+            if not unicodedata.combining(caracter)
+        )
+
+    @classmethod
+    def _deduplicar_entidades(cls, data: dict) -> dict:
+        """Elimina duplicados evidentes y conserva la primera forma del modelo.
+
+        No intenta unir apodos, iniciales o personas parecidas: eso exigiría una
+        decisión semántica que podría inventar una identidad.
+        """
+        alias_a_canonico: dict[str, str] = {}
+
+        def unicos(valores: object) -> list[str]:
+            resultado: list[str] = []
+            vistos: set[str] = set()
+            for valor in valores if isinstance(valores, list) else []:
+                if not isinstance(valor, str) or not valor.strip():
+                    continue
+                clave = cls._clave_entidad(valor)
+                if clave not in vistos:
+                    canonico = " ".join(valor.split())
+                    vistos.add(clave)
+                    resultado.append(canonico)
+                    alias_a_canonico[clave] = canonico
+            return resultado
+
+        for campo in ("delitos", "organizaciones", "lugares"):
+            data[campo] = unicos(data.get(campo))
+
+        personas, vistas_personas = [], set()
+        for persona in data.get("personas") or []:
+            if not isinstance(persona, dict) or not persona.get("nombre"):
+                continue
+            clave = cls._clave_entidad(persona["nombre"])
+            if clave in vistas_personas:
+                continue
+            vistas_personas.add(clave)
+            copia = dict(persona)
+            copia["nombre"] = " ".join(str(persona["nombre"]).split())
+            personas.append(copia)
+            alias_a_canonico[clave] = copia["nombre"]
+        data["personas"] = personas
+
+        objetos, vistos_objetos = [], set()
+        for objeto in data.get("objetos") or []:
+            if not isinstance(objeto, dict) or not objeto.get("nombre"):
+                continue
+            clave = cls._clave_entidad(objeto["nombre"])
+            if clave in vistos_objetos:
+                continue
+            vistos_objetos.add(clave)
+            copia = dict(objeto)
+            copia["nombre"] = " ".join(str(objeto["nombre"]).split())
+            objetos.append(copia)
+            alias_a_canonico.setdefault(clave, copia["nombre"])
+        data["objetos"] = objetos
+
+        relaciones, vistas_relaciones = [], set()
+        for relacion in data.get("relaciones") or []:
+            if not isinstance(relacion, dict):
+                continue
+            copia = dict(relacion)
+            for extremo in ("origen", "destino"):
+                if isinstance(copia.get(extremo), str):
+                    clave = cls._clave_entidad(copia[extremo])
+                    copia[extremo] = alias_a_canonico.get(clave, " ".join(copia[extremo].split()))
+            clave_relacion = tuple(cls._clave_entidad(copia.get(campo)) for campo in ("origen", "tipo", "destino"))
+            if clave_relacion not in vistas_relaciones:
+                vistas_relaciones.add(clave_relacion)
+                relaciones.append(copia)
+        data["relaciones"] = relaciones
         return data
 
     def _consultar_con_reintentos(self, cliente, types, noticia: NoticiaFuente):
